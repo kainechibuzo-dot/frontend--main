@@ -1,0 +1,133 @@
+/* Navbar Styles */
+.navbar {
+    background: var(--bg-color);
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-md) var(--spacing-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: var(--font-xl);
+    font-weight: 700;
+    color: var(--primary-color);
+    cursor: pointer;
+    transition: transform var(--transition-base);
+}
+
+.nav-brand:hover {
+    transform: scale(1.05);
+}
+
+.brand-icon {
+    font-size: var(--font-2xl);
+}
+
+.brand-text {
+    display: none;
+}
+
+/* Navigation Menu */
+.nav-menu {
+    display: flex;
+    gap: var(--spacing-xl);
+    align-items: center;
+}
+
+.nav-menu li a.nav-link {
+    color: var(--text-primary);
+    font-weight: 500;
+    transition: color var(--transition-base);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+}
+
+.nav-menu li a.nav-link:hover {
+    color: var(--primary-color);
+    background-color: var(--bg-light);
+}
+
+/* Hamburger Menu */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    background: transparent;
+    padding: var(--spacing-sm);
+    gap: var(--spacing-xs);
+    border-radius: var(--radius-md);
+}
+
+.hamburger-line {
+    width: 25px;
+    height: 3px;
+    background-color: var(--text-primary);
+    border-radius: var(--radius-full);
+    transition: all var(--transition-base);
+}
+
+.hamburger.active .hamburger-line:nth-child(1) {
+    transform: rotate(45deg) translate(10px, 10px);
+}
+
+.hamburger.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active .hamburger-line:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* Mobile Menu */
+@media (max-width: 768px) {
+    .hamburger {
+        display: flex;
+    }
+    
+    .nav-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        background: var(--bg-color);
+        gap: 0;
+        padding: var(--spacing-md);
+        box-shadow: var(--shadow-lg);
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .nav-menu.active {
+        display: flex;
+    }
+    
+    .nav-menu li {
+        width: 100%;
+    }
+    
+    .nav-menu li a.nav-link {
+        display: block;
+        padding: var(--spacing-md);
+        color: var(--text-primary);
+    }
+    
+    .nav-menu li a.nav-link:hover {
+        background-color: var(--bg-light);
+    }
+    
+    .brand-text {
+        display: inline;
+    }
+}
