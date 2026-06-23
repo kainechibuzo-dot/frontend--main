@@ -1,174 +1,230 @@
-# Shopping Intelligence AI - Frontend
+# 🛒 Shopping Bot Frontend - Production Ready
 
-A modern, responsive web application for intelligent shopping and price comparison powered by AI.
+A robust React frontend for the Shopping Bot API with safe error handling, responsive design, and production-grade code patterns.
 
 ## Features
 
-- **Smart Search**: Find products across multiple stores instantly
-- **Price Comparison**: Compare prices and find the best deals
-- **Price Alerts**: Get notified when prices drop
-- **Watchlist**: Save your favorite products for later
-- **Shopping Cart**: Manage your items before checkout
-- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
-- **Dark Mode Support**: Comfortable viewing in any lighting condition
+✅ **Safe Fetch Wrapper** - Prevents "Unexpected token <" errors  
+✅ **Search Functionality** - Debounced search with instant results  
+✅ **Price Comparison** - Sorted by best deal (cheapest first)  
+✅ **Product Details** - Scrape and display product information  
+✅ **Responsive Design** - Mobile-first, works on all devices  
+✅ **Skeleton Loaders** - Better UX while loading  
+✅ **Error Handling** - Graceful error states everywhere  
+✅ **Defensive Rendering** - Never assumes fields exist  
 
 ## Project Structure
 
 ```
-frontend/
-├── index.html              # Main HTML file
+src/
+├── components/
+│   ├── SearchBar.js           # Search input with debouncing
+│   ├── SearchResults.js       # Results grid with safe rendering
+│   ├── ProductCard.js         # Individual product card
+│   ├── CompareView.js         # Price comparison view
+│   └── ProductDetail.js       # Product detail modal
+├── config/
+│   └── api.js                 # API endpoints (define once, use everywhere)
+├── utils/
+│   └── safeFetch.js           # Safe fetch wrapper (fixes crashes)
 ├── styles/
-│   ├── reset.css          # CSS reset and base styles
-│   ├── variables.css      # CSS custom properties (colors, spacing, etc.)
-│   ├── navbar.css         # Navigation bar styles
-│   ├── main.css           # Main component styles
-│   └── responsive.css     # Responsive design breakpoints
-├── js/
-│   └── app.js             # Main JavaScript application
-└── README.md              # This file
+│   ├── App.css                # Main app styles
+│   ├── SearchBar.css          # Search bar styles
+│   ├── ProductCard.css        # Product card styles
+│   ├── SearchResults.css      # Results container styles
+│   ├── CompareView.css        # Comparison view styles
+│   └── ProductDetail.css      # Modal styles
+├── App.js                     # Main app component
+└── index.js                   # Entry point
 ```
 
-## Pages
+## Installation
 
-### Home
-Welcome page with feature highlights and quick navigation to main sections.
-
-### Search
-Search for products across multiple stores with real-time results.
-
-### Compare
-Compare prices and specifications of similar products side by side.
-
-### Cart
-View and manage items in your shopping cart with summary calculations.
-
-### Watchlist
-Save favorite products and monitor their prices over time.
-
-### Alerts
-Create price drop alerts for products you're interested in.
-
-### About
-Learn more about the Shopping Intelligence AI platform and its mission.
-
-## Technologies Used
-
-- **HTML5**: Semantic markup
-- **CSS3**: Modern styling with CSS variables and Grid/Flexbox
-- **JavaScript (ES6+)**: Interactive functionality
-- **localStorage**: Client-side data persistence
-
-## Getting Started
-
-1. Clone the repository:
 ```bash
-git clone https://github.com/chibuzokaine-ui/frontend-.git
-cd frontend-
+# Install dependencies
+npm install
+
+# Start development server
+npm start
+
+# Build for production
+npm run build
 ```
 
-2. Open `index.html` in your web browser:
-```bash
-# Using Python 3
-python -m http.server 8000
+## API Configuration
 
-# Or using Node.js (if you have http-server installed)
-npx http-server
+Edit `src/config/api.js` to change the backend URL:
+
+```javascript
+const API_BASE = "https://shopping-bot-assd.onrender.com";
 ```
 
-3. Visit `http://localhost:8000` in your browser
+**Rule:** Define backend once, use everywhere. Never hardcode endpoints.
 
-## Features in Detail
+## Safe Fetch Wrapper
 
-### Hamburger Navigation
-The mobile-friendly hamburger menu provides easy navigation on smaller screens with smooth animations.
+The `safeFetch()` function prevents crashes from non-JSON responses:
 
-### Local Storage
-All user data (cart, watchlist, alerts) is stored locally and persists across browser sessions.
+```javascript
+import { safeFetch } from './utils/safeFetch';
 
-### Responsive Grid System
-The design uses CSS Grid and Flexbox for flexible, responsive layouts that work on all screen sizes.
+const data = await safeFetch(url);
 
-### Interactive Notifications
-User actions trigger brief, non-intrusive notifications for feedback.
+if (!data.ok) {
+  // Handle error
+  console.error(data.error);
+} else {
+  // Use data safely
+  const results = data.results || [];
+}
+```
+
+## Core Endpoints
+
+### 🔍 Search
+```
+GET /api/search?q=iphone+15
+
+Response:
+{
+  "ok": true,
+  "results": [
+    {
+      "title": "Apple iPhone 15",
+      "price": "$499",
+      "url": "https://...",
+      "source": "serpapi"
+    }
+  ]
+}
+```
+
+### ⚖️ Compare
+```
+GET /api/compare?q=iphone+15
+
+Response: Same as search, but results are sorted (cheapest first)
+```
+
+### 🔗 Scrape
+```
+GET /api/scrape?url=https://...
+
+Response:
+{
+  "ok": true,
+  "title": "iPhone 15",
+  "price": 499,
+  "image": "...",
+  "availability": "In Stock"
+}
+```
+
+## Defensive Rendering Rules
+
+**ALWAYS assume fields might be missing:**
+
+```javascript
+// ❌ WRONG - Will crash if field missing
+const price = item.price;
+
+// ✅ RIGHT - Safe with default
+const price = item.price || 'N/A';
+```
+
+**ALWAYS check results exist:**
+
+```javascript
+// ✅ RIGHT
+const results = data.results || [];
+results.map(item => <ProductCard item={item} />);
+```
+
+## Component Usage
+
+### SearchBar
+```jsx
+<SearchBar onSearch={handleSearch} isLoading={isLoading} />
+```
+
+### SearchResults
+```jsx
+<SearchResults 
+  results={results} 
+  isLoading={isLoading} 
+  error={error} 
+/>
+```
+
+### CompareView
+```jsx
+<CompareView query={searchQuery} />
+```
+
+### ProductDetail
+```jsx
+<ProductDetail url={productUrl} onClose={closeModal} />
+```
+
+## Error Handling
+
+All components handle errors gracefully:
+
+- **Network errors** → "Network error" message
+- **Invalid JSON** → "Invalid JSON response" message
+- **Empty results** → "No products found" state
+- **Missing fields** → Default values (N/A, Unknown, etc.)
+
+## Performance
+
+- **Search debounce**: 300ms
+- **Skeleton loaders**: Show while fetching
+- **Responsive grid**: Auto-adjusts columns
+- **Lazy rendering**: Only renders visible results
 
 ## Browser Support
 
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
-- Mobile browsers (iOS Safari, Chrome Mobile)
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
 
-## CSS Custom Properties
+## Production Deployment
 
-### Colors
-- `--primary-color`: #6366f1
-- `--secondary-color`: #10b981
-- `--accent-color`: #f59e0b
+```bash
+# Build for production
+npm run build
 
-### Spacing
-- `--spacing-xs` to `--spacing-2xl`
-- Base unit: 0.25rem
+# Outputs to ./build directory
+# Deploy to Netlify, Vercel, or any static host
+```
 
-### Responsive Breakpoints
-- Desktop: 1200px+
-- Tablet: 768px - 1199px
-- Mobile: 480px - 767px
-- Small Mobile: < 480px
+## Troubleshooting
 
-## JavaScript API
+### "Unexpected token <" Error
+→ Backend returned HTML instead of JSON  
+→ This is fixed by using `safeFetch()`  
+→ Check backend is running and responding correctly
 
-### Navigation
-- `navigateTo(pageId)` - Navigate to a specific page
+### Blank screen or crashes
+→ Check browser console for errors  
+→ Verify API_BASE URL in `config/api.js`  
+→ Ensure backend is accessible
 
-### Search & Compare
-- `performSearch()` - Execute product search
-- `performCompare()` - Compare products
-
-### Cart Management
-- `addToCart(productIndex)` - Add item to cart
-- `removeFromCart(index)` - Remove item from cart
-- `displayCart()` - Display cart contents
-
-### Watchlist Management
-- `addToWatchlist(productIndex)` - Add item to watchlist
-- `removeFromWatchlist(index)` - Remove item from watchlist
-- `displayWatchlist()` - Display watchlist items
-
-### Alerts
-- `createAlert()` - Create a new price alert
-- `deleteAlert(index)` - Delete a price alert
-- `displayAlerts()` - Display all alerts
-
-### Utilities
-- `showNotification(message)` - Display a notification
-
-## Performance Optimizations
-
-- Minimal external dependencies
-- CSS-based animations for smooth performance
-- Efficient event delegation
-- localStorage for instant data loading
+### Missing search results
+→ Check backend is running  
+→ Verify API response format  
+→ Use browser DevTools to inspect network requests
 
 ## Future Enhancements
 
-- [ ] Backend API integration
+- [ ] Tailwind CSS for styling
+- [ ] Animated product cards
+- [ ] Instant search (0.3s feel)
+- [ ] Advanced filters
+- [ ] Wishlist functionality
 - [ ] User authentication
-- [ ] Advanced filtering and sorting
-- [ ] Product recommendations
-- [ ] Email notifications for price drops
-- [ ] PWA support
-- [ ] Dark mode toggle
-- [ ] Multi-language support
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-MIT License - feel free to use this project for your own purposes.
-
-## Support
-
-For issues or questions, please open an issue on GitHub or contact us at hello@shoppingai.com
+MIT
